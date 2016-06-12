@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sn.lobtool.mapper.PayMethodMapper">
+
+  <select id="getAllPayMethod" resultType="PayMethod">
+  	SELECT
+			PM.PayMethodId,
+			PM.Code,
+			PM.Name,
+			PM.IsSystem,
+			PM.IsMobile,
+			PM.IsHaveChange,
+			PM.IsDisabled,
+			PM.CheckEntry,
+  			PM.IsHasNominalValue,
+  			PM.NominalValue,
+  			PM.IsDelete,
+  			PM.DeleteTime
+  	FROM PayMethod PM
+  	WHERE 1 = 1
+  </select>
+
+</mapper>
