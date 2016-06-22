@@ -4,76 +4,8 @@
 	<link rel="stylesheet" href="../../resources/javascript/dojo/resources/dojo.css" >
 	<link rel="stylesheet" href="../../resources/javascript/dgrid/css/dgrid.css" >
 	<link rel="stylesheet" href="../../resources/javascript/dgrid/css/skins/claro.css" >
-    <style type="text/css">
-    table{
-    	width:92%;
-    	height:200;
-    	position: relative;
-    	left: 50px;
-    	top: 15px;
-    	frame:box;
-    	border:none;
-    	border-color:black;
-    	border-radius:5px;
-    	}
-    table td{
-    	color:blue;
-    	text-align:center;
-    	font-size:32;
-    	color:#026EAC;
-    	border:solid;
-    	border-radius:5px;
-    	border-color:#026EAC;
-    	}
-   	table th{
-   	   	text-align:center;
-   	   	color:#014A81;
-   	   	font-size: 40;
-   	   	font-family:Microsoft YaHei;
-    	border:solid;
-    	border-color:#026EAC;
-   	   	padding: 10; 
-    	border-radius:5px;
-   		}
-    
-    h1{
-    	color:white;
-    	text-align:center;
-       	font-family:Microsoft YaHei;
-    	font-size: 20;
-    }
-    #grid {
-        width:92%;
-        height:300px;
-        display:block;
-        //float:left;
-        position: relative;
-        left: 50px;
-        right: 30px;
-        top: 20px;
-        background-color:#6113BC;
-        border: 0;
-       // padding-right:2cm
-    }
-    
-    #chartNode {
-        width:92%;
-        height:400px;
-        display:block;
-        //float:right;
-        position: relative;
-        left: 50px;
-        top: 20px;
-    }
-    #chartSalesTrend {
-        width:92%;
-        height:400px;
-        display:block;
-        position: relative;
-        left: 50px;
-        top: 20px;
-    }
-    </style>
+	
+    <link rel="stylesheet" href="../../resources/css/lobtool.css" >
 </head>
 <body background="../../resources/images/page_bg.jpg"
  class="claro">
@@ -96,7 +28,7 @@
 		require(['dgrid/Grid', 'dojo/domReady!'], function(Grid) {
 			var grid = new Grid({
 				columns: {
-					billDate: '',
+					billDate: "营业日期",
 					salesAmount: "营业额",
 					numOfBill: "订单数",
 					numOfCust: "顾客数",
@@ -161,19 +93,19 @@
 		});
 	</script>
 	<!--构建营业额数据统计表-->
-	<h1>当日营业数据汇总</h1>
+	<h1><@spring.message "salesAnalysis.header"/></h1>
 	<table border="1">
 	<!--固定表头-->
 	<tr bgcolor="#AB60F0">
 		<th></th>
-  		<th>营业额</th>
-  		<th>订单数</th>
-  		<th>来客数</th>
-  		<th>客单价</th>
+  		<th><@spring.message "salesAnalysis.header"/></th>
+  		<th><@spring.message "salesAnalysis.salesAmount"/></th>
+  		<th><@spring.message "salesAnalysis.numOfCust"/></th>
+  		<th><@spring.message "salesAnalysis.billPerCust"/></th>
 	</tr>
 	<!--当日营业数据-->
 	<tr bgcolor="#eee6f5">
-  		<th>当日汇总</th>
+  		<th><@spring.message "salesAnalysis.dailySummary"/></th>
   		<td>123654</td>
   		<td>88</td>
   		<td>93</td>
@@ -183,7 +115,7 @@
 	<tr bgcolor="#AB60F0"><th>&nbsp;</th><th></th><th></th><th></th><th></th></tr>
 	<!--当月数据汇总-->
 	<tr bgcolor="#eee6f5">
-  		<th>本月累计</th>
+  		<th><@spring.message "salesAnalysis.monthSummary.current"/></th>
   		<td>523654</td>
   		<td>888</td>
   		<td>1193</td>
@@ -191,7 +123,7 @@
 	</tr>
 	<!--上月同期数据汇总-->
 	<tr bgcolor="#eee6f5">
-  		<th>上月同期</th>
+  		<th><@spring.message "salesAnalysis.monthSummary.previous"/></th>
   		<td>473654</td>
   		<td>898</td>
   		<td>1093</td>
@@ -199,7 +131,7 @@
 	</tr>
 	<!--环比增长-->
 	<tr bgcolor="#eee6f5">
-  		<th>环比增长</th>
+  		<th><@spring.message "salesAnalysis.monthSummary.monthComparison"/></th>
   		<td>10.55%</td>
   		<td>-1.11%</td>
   		<td>9.62%</td>
@@ -211,7 +143,7 @@
 
 	<!--构建营业额走势图-->
 	<p>
-	<h1>营业额走势</h1>		
+	<h1><@spring.message "salesTrend.title"/></h1>		
 		<div id="chartSalesTrend"></div>
 
 		<!-- load dojo and provide config via data attribute -->
@@ -272,7 +204,7 @@
 	</p>
 	<p>
 	<br />
-	<h1>支付方式</h1>
+	<h1>Paymethod</h1>
 	</p>
 </body>
 </html>

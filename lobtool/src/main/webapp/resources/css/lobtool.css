@@ -1,0 +1,68 @@
+table{
+    width:92%;
+    height:200;
+    position: relative;
+    left: 50px;
+    top: 15px;
+    frame:box;
+    border:none;
+    border-color:black;
+    border-radius:5px;
+    }
+table td{
+    color:blue;
+    text-align:center;
+    font-size:32;
+    color:#026EAC;
+    border:solid;
+    border-radius:5px;
+    border-color:#026EAC;
+    }
+table th{
+    text-align:center;
+    color:#014A81;
+    font-size: 40;
+    font-family:Microsoft YaHei;
+    border:solid;
+    border-color:#026EAC;
+    padding: 10; 
+    border-radius:5px;
+    }
+
+h1{
+    color:white;
+    text-align:center;
+    font-family:Microsoft YaHei;
+    font-size: 20;
+}
+#grid {
+    width:92%;
+    height:300px;
+    display:block;
+    //float:left;
+    position: relative;
+    left: 50px;
+    right: 30px;
+    top: 20px;
+    background-color:#6113BC;
+    border: 0;
+   // padding-right:2cm
+}
+
+#chartNode {
+    width:92%;
+    height:400px;
+    display:block;
+    //float:right;
+    position: relative;
+    left: 50px;
+    top: 20px;
+}
+#chartSalesTrend {
+    width:92%;
+    height:400px;
+    display:block;
+    position: relative;
+    left: 50px;
+    top: 20px;
+}

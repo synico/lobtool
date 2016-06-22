@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sn.lobtool.mapper.MonthlySalesEntryMapper">
+
+    <select id="getMonthlySalesEntries" resultType="MonthlySalesEntry">
+        SELECT strftime('%Y-%m',BillTime) as billDate, 
+            count(*) as numOfBill, 
+            round(SUM(PaidFee),2) as totalAmount, 
+            SUM(Persons) as numOfCust, 
+            round((round(SUM(PaidFee),2)/SUM(Persons)),2) as billPerCust 
+	    FROM MhtBill
+	    WHERE 1 = 1 and 
+	        (BillTime &gt; date(#{param2}, 'start of month', '-1 day', '-1 month') and 
+	         BillTime &lt; date(#{param2}, 'start of month', '+1 month'))
+	    GROUP BY billDate
+	    ORDER BY billDate DESC
+    </select>
+
+</mapper>
