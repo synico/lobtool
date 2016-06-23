@@ -98,44 +98,44 @@
 	<!--固定表头-->
 	<tr bgcolor="#AB60F0">
 		<th></th>
-  		<th><@spring.message "salesAnalysis.header"/></th>
   		<th><@spring.message "salesAnalysis.salesAmount"/></th>
+  		<th><@spring.message "salesAnalysis.numOfBill"/></th>
   		<th><@spring.message "salesAnalysis.numOfCust"/></th>
   		<th><@spring.message "salesAnalysis.billPerCust"/></th>
 	</tr>
 	<!--当日营业数据-->
 	<tr bgcolor="#eee6f5">
   		<th><@spring.message "salesAnalysis.dailySummary"/></th>
-  		<td>123654</td>
-  		<td>88</td>
-  		<td>93</td>
-  		<td>101</td>
+  		<td>${todaySE.totalAmount}</td>
+  		<td>${todaySE.numOfBill}</td>
+  		<td>${todaySE.numOfCust}</td>
+  		<td>${todaySE.billPerCust}</td>
 	</tr>
 	<!--占位行-->
 	<tr bgcolor="#AB60F0"><th>&nbsp;</th><th></th><th></th><th></th><th></th></tr>
 	<!--当月数据汇总-->
 	<tr bgcolor="#eee6f5">
-  		<th><@spring.message "salesAnalysis.monthSummary.current"/></th>
-  		<td>523654</td>
-  		<td>888</td>
-  		<td>1193</td>
-  		<td>130.12</td>
+  		<th><@spring.message "salesAnalysis.monthSummary.present"/></th>
+  		<td>${presentMonthSE.totalAmount?string("#0.0#")}</td>
+  		<td>${presentMonthSE.numOfBill}</td>
+  		<td>${presentMonthSE.numOfCust}</td>
+  		<td>${presentMonthSE.billPerCust?string("#0.0#")}</td>
 	</tr>
 	<!--上月同期数据汇总-->
 	<tr bgcolor="#eee6f5">
   		<th><@spring.message "salesAnalysis.monthSummary.previous"/></th>
-  		<td>473654</td>
-  		<td>898</td>
-  		<td>1093</td>
-  		<td>122</td>
+  		<td>${previousMonthSE.totalAmount?string("#0.0#")}</td>
+  		<td>${previousMonthSE.numOfBill}</td>
+  		<td>${previousMonthSE.numOfCust}</td>
+  		<td>${previousMonthSE.billPerCust?string("#0.0#")}</td>
 	</tr>
 	<!--环比增长-->
 	<tr bgcolor="#eee6f5">
   		<th><@spring.message "salesAnalysis.monthSummary.monthComparison"/></th>
-  		<td>10.55%</td>
-  		<td>-1.11%</td>
-  		<td>9.62%</td>
-  		<td>6.65%</td>
+  		<td>${(((presentMonthSE.totalAmount-previousMonthSE.totalAmount)/previousMonthSE.totalAmount)*100)?string("#0.0#")}%</td>
+  		<td>${(((presentMonthSE.numOfBill-previousMonthSE.numOfBill)/previousMonthSE.numOfBill)*100)?string("#0.0#")}%</td>
+  		<td>${(((presentMonthSE.numOfCust-previousMonthSE.numOfCust)/previousMonthSE.numOfCust)*100)?string("#0.0#")}%</td>
+  		<td>${(((presentMonthSE.billPerCust-previousMonthSE.billPerCust)/previousMonthSE.billPerCust)*100)?string("#0.0#")}%</td>
 	</tr>
 	</table>
 
@@ -159,10 +159,29 @@
 	        "dojox/charting/axis2d/Default",
 	        "dojox/charting/plot2d/Lines",
 	        "dojo/domReady!"
-		], function(Chart, theme) {
-			// Define the data
-			var dailySales = [10000,9200,11811,12000,11111];
-			var lastWeekDailySales = [12000,19200,10811,10000,17662,10087,10011];
+		], function(Chart, theme) { 
+		    var dailySales = [];
+		    var numOfBill = [];
+		    var numOfCust = [];
+		    var billPerCust = [];
+		    <#list dailySalesEntries as entry>
+		        numOfBill.push(${entry.numOfBill});
+		        dailySales.push(${entry.totalAmount?string("##0.0#")});
+		        numOfCust.push(${entry.numOfCust});
+		        billPerCust.push(${entry.billPerCust});
+            </#list>
+            
+            var preWkDailySales = [];
+            var preWkNumOfBill = [];
+            var preWkNumOfCust = [];
+            var preWkBillPerCust = [];
+            <#list preWeekDailySalesEntries as entry>
+                preWkDailySales.push();
+                preWkNumOfBill.push();
+                preWkNumOfCust.push();
+                preWkBillPerCust.push();
+            </#list>
+            
 			// Create the chart within it's "holding" node
 			var chart = new Chart("chartSalesTrend");
 			// Set the theme
@@ -189,9 +208,9 @@
 
 			// Add the series of data
 			chart.addSeries("MonthlySales",dailySales,{plot: "default",fill:"#AB60F0"});
-			chart.addSeries("LastWeek",lastWeekDailySales,{plot: "default",fill:"lightblue"});
-			chart.addSeries("avgCustomerPay", [70,19,18,10,17],{plot: "other", stroke: {color: "blue"}, fill:"lightblue"});
-			chart.addSeries("sumOfCustomer", [60,39,48,60,97],{plot: "other", stroke: {color: "red"}, fill:"lightblue"});
+			chart.addSeries("LastWeek",preWkDailySales,{plot: "default",fill:"lightblue"});
+			chart.addSeries("avgCustomerPay", billPerCust,{plot: "other", stroke: {color: "blue"}, fill:"lightblue"});
+			chart.addSeries("sumOfCustomer", numOfCust,{plot: "other", stroke: {color: "red"}, fill:"lightblue"});
 
 			// Render the chart!
 			chart.render();
