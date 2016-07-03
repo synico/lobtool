@@ -4,14 +4,138 @@
 	<link rel="stylesheet" href="../../resources/javascript/dojo/resources/dojo.css" >
 	<link rel="stylesheet" href="../../resources/javascript/dgrid/css/dgrid.css" >
 	<link rel="stylesheet" href="../../resources/javascript/dgrid/css/skins/claro.css" >
-	
-    <link rel="stylesheet" href="../../resources/css/lobtool.css" >
+    <style type="text/css">
+    table{
+    	width:92%;
+    	height:200;
+    	position: relative;
+    	left: 50px;
+    	top: 15px;
+    	frame:box;
+    	border:none;
+    	border-color:black;
+    	border-radius:5px;
+    	}
+    table td{
+    	color:blue;
+    	text-align:center;
+    	font-size:32;
+    	color:#026EAC;
+    	border:solid;
+    	border-radius:5px;
+    	border-color:#026EAC;
+    	}
+   	table th{
+   	   	text-align:center;
+   	   	color:#014A81;
+   	   	font-size: 40;
+   	   	font-family:Microsoft YaHei;
+    	border:solid;
+    	border-color:#026EAC;
+   	   	padding: 10; 
+    	border-radius:5px;
+   		}
+    
+    h1{
+    	color:white;
+    	text-align:center;
+       	font-family:Microsoft YaHei;
+    	font-size: 20;
+    }
+    #grid {
+        width:92%;
+        height:300px;
+        display:block;
+        position: relative;
+        left: 50px;
+        right: 30px;
+        top: 20px;
+        background-color:#6113BC;
+        border: 0;
+       // padding-right:2cm
+    }
+    
+    #chartNode,#chartSalesTrend {
+        width:92%;
+        height:400px;
+        display:block;
+        position: relative;
+        left: 50px;
+        top: 1px;
+        bottom: 10px;
+    }
+    #symbol {
+        width:92%;
+        height:10px;
+        display:block;
+        position: relative;
+        left: 50px;
+        top: 1px;
+        bottom: 2px;
+        Color: #AB60F0;
+        font-size: 20;
+        font-family:Microsoft YaHei;
+    }
+    #bottomSpaceBlock {
+        width:100%;
+        height:100px;
+        display:block;
+        position: relative;
+        left: 50px;
+        top: 120px;
+        bottom: 10px;
+        text-align:center;
+    }
+    #paymentMethod {
+        width:45%;
+        height:400px;
+        display:inline-block;
+        position: relative;
+        left: 50px;
+        top: 65px;
+        bottom: 10px;
+    }
+     #timePeriod {
+        width:45%;
+        height:400px;
+        display:inline-block;
+        position: relative;
+        left: 7%;
+        bottom: 10px;
+        top: 65px;
+        ticks: true;
+
+    }
+    #customerCount {
+        width:45%;
+        height:400px;
+        display:inline-block;
+        position: relative;
+        left: 50px;
+        bottom: 10px;
+        top: 80px;
+        ticks: true;
+
+    }
+    #avgPay {
+        width:45%;
+        height:400px;
+        display:inline-block;
+        position: relative;
+        left: 7%;
+        top: 80px;
+        bottom: 10px;
+    }
+
+   
+    </style>
 </head>
 <body background="../../resources/images/page_bg.jpg"
  class="claro">
 	<script src="../../resources/javascript/dojoConfig.js"></script>
 	<script src="../../resources/javascript/dojo/dojo.js"></script>
 	
+	<!-- Script 营业额数据表格-->
 	<script>
 		var data = [
 			<#list dailySalesEntries as entry>
@@ -28,17 +152,18 @@
 		require(['dgrid/Grid', 'dojo/domReady!'], function(Grid) {
 			var grid = new Grid({
 				columns: {
-					billDate: "营业日期",
-					salesAmount: "营业额",
-					numOfBill: "订单数",
-					numOfCust: "顾客数",
-					billPerCust: "客单价",
+					billDate: '<@spring.message "dailySalesReport.billDate"/>',
+					salesAmount: '<@spring.message "dailySalesReport.salesAmount"/>',
+					numOfBill: '<@spring.message "dailySalesReport.numOfBill"/>',
+					numOfCust: '<@spring.message "dailySalesReport.numOfCust"/>',
+					billPerCust: '<@spring.message "dailySalesReport.billPerCust"/>',
 				}
 			}, 'grid');
 			grid.renderArray(data);
 		});
 	</script>
 	
+	<!-- Script 营业额柱状图 by Nick -->
 	<script>
 		var chartColumnsData = new Array(data.length);
 		require([
@@ -62,6 +187,7 @@
 			chart.addPlot("default", {
 				type: "Columns",
 				markers: true,
+				labels: true, labelStyle: "outside", labelOffset: 25,
 				gap: 5,
 			});
 			
@@ -92,8 +218,276 @@
 			chart.render();
 		});
 	</script>
-	<!--构建营业额数据统计表-->
+
+	<!-- Script 营业额柱状图+折线图 by Sam -->
+	<script>
+		require([
+			"dojox/charting/Chart",
+	        "dojox/charting/themes/PlotKit/purple",
+	        "dojox/charting/plot2d/Columns",
+	        "dojox/charting/plot2d/Bars",
+	       // "dojox/charting/plot2d/Markers",
+	        "dojox/charting/plot2d/ClusteredColumns",
+	        "dojox/charting/axis2d/Default",
+	        "dojox/charting/plot2d/Lines",
+	        "dojox/charting/action2d/Highlight",
+	        "dojox/charting/action2d/Tooltip",
+	        "dojo/domReady!"
+		], function(Chart, theme) {
+			// Define the data
+			var dailySales = [];
+		    var numOfBill = [];
+		    var numOfCust = [];
+		    var billPerCust = [];
+		    <#list dailySalesEntries as entry>
+		        numOfBill.push(${entry.numOfBill});
+		        dailySales.push(${entry.totalAmount?string("##0.0#")});
+		        numOfCust.push(${entry.numOfCust});
+		        billPerCust.push(${entry.billPerCust});
+            </#list>
+            
+            var preWkDailySales = [];
+            var preWkNumOfBill = [];
+            var preWkNumOfCust = [];
+            var preWkBillPerCust = [];
+            <#list preWeekDailySalesEntries as entry>
+                preWkDailySales.push();
+                preWkNumOfBill.push();
+                preWkNumOfCust.push();
+                preWkBillPerCust.push();
+            </#list>
+			
+			// Create the chart within it's "holding" node
+			var chart = new Chart("chartSalesTrend");
+			// Set the theme
+			chart.setTheme(theme);
+			// Add the only/default plot 
+			chart.addPlot("default", {
+				type: "ClusteredColumns",
+				columns: true,
+				minBarSize: 30, maxBarSize: 50,
+				font: "normal normal bold 8pt Tahoma",
+				//labels: true, labelStyle: "inside", labelOffset: -50,
+				gap: 10,
+			});
+			chart.addPlot("other", {type: "Lines", hAxis: "x", vAxis: "other y"});
+	
+			chart.addAxis("x",{
+    	labels: [{value: 1, text: "Mon"}, {value: 2, text: "Tue"},
+        {value: 3, text: "Wed"}, {value: 4, text: "Thu"},
+        {value: 5, text: "Fri"},{value: 6, text: "Sat"},{value: 7, text: "Sun"}]
+    	});
+			chart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major" });
+			//chart.addAxis("other x", {leftBottom: false});
+			chart.addAxis("other y", {min: 0, max: 100, fixLower: "minor", fixUpper: "minor", vertical: true, leftBottom: false});
+
+			// Add the series of data
+			chart.addSeries("MonthlySales",dailySales,{plot: "default",fill:"#AB60F0"});
+			chart.addSeries("LastWeek",preWkDailySales,{plot: "default",fill:"lightblue"});
+			chart.addSeries("avgCustomerPay", billPerCust,{plot: "other", stroke: {color: "blue"}, fill:"lightblue"});
+			chart.addSeries("sumOfCustomer", numOfCust,{plot: "other", stroke: {color: "red"}, fill:"lightblue"});
+
+			// Render the chart!
+			var anim1 = new dojox.charting.action2d.Highlight(chart, "default", {highlight: "lightskyblue"});
+			var anim2 = new dojox.charting.action2d.Tooltip(chart, "default");
+			chart.render();
+			
+		});
+			
+		</script>
+
+	<!-- Script 支付方式饼图 by Sam -->
+		<script>
+
+			// x and y coordinates used for easy understanding of where they should display
+			// Data represents website visits over a week period
+			chartData = [
+				{ x: 1, y: 19021, text: "支付宝 16.43%" },
+				{ x: 1, y: 12837, text: "现金 11.09%" },
+				{ x: 1, y: 12378, text: "微信 10.69%" },
+				{ x: 1, y: 21882 },
+				{ x: 1, y: 17654 },
+				{ x: 1, y: 15833 },
+				{ x: 1, y: 16122 }
+			];
+
+			require([
+				 // Require the basic 2d chart resource
+				"dojox/charting/Chart",
+				// Require the theme of our choosing
+				"dojox/charting/themes/PlotKit/purple",
+				// Charting plugins: 
+				// 	Require the Pie type of Plot 
+				"dojox/charting/plot2d/Pie",
+				// Wait until the DOM is ready
+				"dojo/domReady!"
+			], function(Chart, theme, PiePlot){
+
+				// Create the chart within it's "holding" node
+				var pieChart = new Chart("paymentMethod", {title: "支付方式",
+      titlePos: "bottom",
+      titleGap: 5,
+      titleFont: "normal normal normal 15pt Microsoft YaHei",
+      titleFontColor: "#014A81"});
+				
+				// Set the theme
+				pieChart.setTheme(theme);
+				
+				// Add the only/default plot 
+				pieChart.addPlot("default", {
+					type: PiePlot, // our plot2d/Pie module reference as type value
+					radius: 200,
+					fontColor: "#014A81",
+					title: "test",
+					labelOffset: -20
+				});
+				
+				// Add the series of data
+				pieChart.addSeries("January",chartData);
+
+				// Render the chart!
+				pieChart.render();
+
+			});
+		</script>
+
+	<!-- Script 营业额分时段饼图 by Sam -->
+		<script>
+
+			timePeriodData = [
+				{ x: 1, y: 4021, text: "午市 4021 36.1%" },
+				{ x: 1, y: 2037, text: "下午 2037 18.3%" },
+				{ x: 1, y: 5078, text: "晚上 5078 45.6%" }
+			];
+			require([
+				"dojox/charting/Chart",
+				"dojox/charting/themes/PlotKit/purple",
+				"dojox/charting/plot2d/Pie",
+				"dojo/domReady!"
+			], function(Chart, theme, PiePlot){
+				// Create the chart within it's "holding" node
+				var pieChart = new Chart("timePeriod", 
+											{title: "营业额 11136￥",
+      										 titlePos: "bottom",
+      										 titleGap: 5,
+      										 titleFont: "normal normal normal 15pt Microsoft YaHei",
+      										 titleFontColor: "#014A81"});
+				// Set the theme
+				pieChart.setTheme(theme);		
+				// Add the only/default plot 
+				pieChart.addPlot("default", {
+					type: PiePlot, // our plot2d/Pie module reference as type value
+					radius: 200,
+					fontColor: "#014A81",
+					title: "test",
+					labelOffset: -20,
+					font: "normal normal normal 10pt Microsoft YaHei"
+
+				});
+				
+				// Add the series of data
+				pieChart.addSeries("January",timePeriodData);
+
+				// Render the chart!
+				pieChart.render();
+
+			});
+		</script>
+
+	<!-- Script 用餐人次饼图 by Sam -->
+		<script>
+
+			customerCountData = [
+				{ x: 1, y: 31, text: "午市 31人 31.63%" },
+				{ x: 1, y: 17, text: "下午 17人 17.34%" },
+				{ x: 1, y: 50, text: "晚上 50人 51.02%" }
+			];
+			require([
+				"dojox/charting/Chart",
+				"dojox/charting/themes/PlotKit/purple",
+				"dojox/charting/plot2d/Pie",
+				"dojo/domReady!"
+			], function(Chart, theme, PiePlot){
+				// Create the chart within it's "holding" node
+				var pieChart = new Chart("customerCount", 
+											{title: "用餐人次 98人",
+      										 titlePos: "bottom",
+      										 titleGap: 5,
+      										 titleFont: "normal normal normal 15pt Microsoft YaHei",
+      										 titleFontColor: "#014A81"});
+				// Set the theme
+				pieChart.setTheme(theme);		
+				// Add the only/default plot 
+				pieChart.addPlot("default", {
+					type: PiePlot, // our plot2d/Pie module reference as type value
+					radius: 200,
+					fontColor: "#014A81",
+					title: "test",
+					labelOffset: -20,
+					font: "normal normal normal 10pt Microsoft YaHei"
+
+				});
+				
+				// Add the series of data
+				pieChart.addSeries("January",customerCountData);
+
+				// Render the chart!
+				pieChart.render();
+
+			});
+		</script>
+
+	<!-- Script 人均消费饼图 by Sam -->
+		<script>
+
+			avgPayData = [
+				{ x: 1, y: 81, text: "午市 81￥ 32.79%" },
+				{ x: 1, y: 69, text: "下午 69￥ 27.93%" },
+				{ x: 1, y: 97, text: "晚上 97￥ 39.27%" }
+			];
+			require([
+				"dojox/charting/Chart",
+				"dojox/charting/themes/PlotKit/purple",
+				"dojox/charting/plot2d/Pie",
+				"dojo/domReady!"
+			], function(Chart, theme, PiePlot){
+				// Create the chart within it's "holding" node
+				var pieChart = new Chart("avgPay", 
+											{title: "人均消费 82.33￥",
+      										 titlePos: "bottom",
+      										 titleGap: 5,
+      										 titleFont: "normal normal normal 15pt Microsoft YaHei",
+      										 titleFontColor: "#014A81"});
+				// Set the theme
+				pieChart.setTheme(theme);		
+				// Add the only/default plot 
+				pieChart.addPlot("default", {
+					type: PiePlot, // our plot2d/Pie module reference as type value
+					radius: 200,
+					fontColor: "#014A81",
+					title: "test",
+					labelOffset: -20,
+					font: "normal normal normal 10pt Microsoft YaHei"
+
+				});
+				
+				// Add the series of data
+				pieChart.addSeries("January",avgPayData);
+
+				// Render the chart!
+				pieChart.render();
+
+			});
+		</script>
+
+
+
+
+
+
+	<!--View 构建营业额数据统计表-->
 	<h1><@spring.message "salesAnalysis.header"/></h1>
+
 	<table border="1">
 	<!--固定表头-->
 	<tr bgcolor="#AB60F0">
@@ -103,7 +497,7 @@
   		<th><@spring.message "salesAnalysis.numOfCust"/></th>
   		<th><@spring.message "salesAnalysis.billPerCust"/></th>
 	</tr>
-	<!--当日营业数据-->
+	<!--当日营业数据 table-->
 	<tr bgcolor="#eee6f5">
   		<th><@spring.message "salesAnalysis.dailySummary"/></th>
   		<td>${todaySE.totalAmount}</td>
@@ -141,89 +535,34 @@
 
 	<br />
 
-	<!--构建营业额走势图-->
-	<p>
-	<h1><@spring.message "salesTrend.title"/></h1>		
+	<!--View 构建营业额走势图-->
+		<h1>本周营业额走势图</h1>
+		<p id=symbol><img src="../../resources/images/img_currentWeek.jpg"  alt="本周营业额图例" />&nbsp&nbsp本周营业数据&nbsp&nbsp
+					 <img src="../../resources/images/img_lastWeek.jpg" alt="上周营业额图例"/>&nbsp&nbsp上周营业数据&nbsp&nbsp
+					 <img src="../../resources/images/img_blueLine.jpg" alt="客单价"/>&nbsp&nbsp客单价&nbsp&nbsp
+					 <img src="../../resources/images/img_redLine.jpg" alt="来客数"/>&nbsp&nbsp来客数&nbsp&nbsp
+		</p>
 		<div id="chartSalesTrend"></div>
+		
+	<!-- View 支付方式饼图 -->
+		<div id="paymentMethod"></div>
+		
+	<!-- View 各时段消费金额汇总 -->
+		<div id="timePeriod"></div>
+		
+	<!-- View 用餐人次 -->
+		<div id="customerCount"></div>
+		
+	<!-- View 人均消费 -->
+		<div id="avgPay"></div>
+		
+		
+		<div id=bottomSpaceBlock> <h1>报表已全部加载完成</h1>
+		</div>
 
-		<!-- load dojo and provide config via data attribute -->
-		<script>
-		require([
-			"dojox/charting/Chart",
-	        //"dojox/charting/themes/MiamiNice",
-	        "dojox/charting/themes/PlotKit/purple",
-	        "dojox/charting/plot2d/Columns",
-	        "dojox/charting/plot2d/Bars",
-	        "dojox/charting/plot2d/Markers",
-	        "dojox/charting/plot2d/ClusteredColumns",
-	        "dojox/charting/axis2d/Default",
-	        "dojox/charting/plot2d/Lines",
-	        "dojo/domReady!"
-		], function(Chart, theme) { 
-		    var dailySales = [];
-		    var numOfBill = [];
-		    var numOfCust = [];
-		    var billPerCust = [];
-		    <#list dailySalesEntries as entry>
-		        numOfBill.push(${entry.numOfBill});
-		        dailySales.push(${entry.totalAmount?string("##0.0#")});
-		        numOfCust.push(${entry.numOfCust});
-		        billPerCust.push(${entry.billPerCust});
-            </#list>
-            
-            var preWkDailySales = [];
-            var preWkNumOfBill = [];
-            var preWkNumOfCust = [];
-            var preWkBillPerCust = [];
-            <#list preWeekDailySalesEntries as entry>
-                preWkDailySales.push();
-                preWkNumOfBill.push();
-                preWkNumOfCust.push();
-                preWkBillPerCust.push();
-            </#list>
-            
-			// Create the chart within it's "holding" node
-			var chart = new Chart("chartSalesTrend");
-			// Set the theme
-			chart.setTheme(theme);
-			// Add the only/default plot 
-			chart.addPlot("default", {
-				type: "ClusteredColumns",
-				markers: true,
-				minBarSize: 30, maxBarSize: 50,
-				gap: 5
-			});
-			chart.addPlot("other", {type: "Lines", hAxis: "x", vAxis: "other y",labels: true, labelStyle: "outside", labelOffset: 25});
-			
-			// Add axes
-			chart.addAxis("x",{
-    	labels: [{value: 1, text: "Mon"}, {value: 2, text: "Tue"},
-        {value: 3, text: "Wed"}, {value: 4, text: "Thu"},
-        {value: 5, text: "Fri"},{value: 6, text: "Sat"},{value: 7, text: "Sun"}]
-    	});
-			chart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major" });
-			//chart.addAxis("other x", {leftBottom: false});
-			chart.addAxis("other y", {min: 0, max: 100, fixLower: "minor", fixUpper: "minor", vertical: true, leftBottom: false});
-				//chart.addAxis("y", { min: 5000, max: 15000, vertical: true, fixLower: "minor", fixUpper: "minor" });
 
-			// Add the series of data
-			chart.addSeries("MonthlySales",dailySales,{plot: "default",fill:"#AB60F0"});
-			chart.addSeries("LastWeek",preWkDailySales,{plot: "default",fill:"lightblue"});
-			chart.addSeries("avgCustomerPay", billPerCust,{plot: "other", stroke: {color: "blue"}, fill:"lightblue"});
-			chart.addSeries("sumOfCustomer", numOfCust,{plot: "other", stroke: {color: "red"}, fill:"lightblue"});
 
-			// Render the chart!
-			chart.render();
-			
-		});
-			
-		</script>
-		<br />
-	<!--<div id="chartNode"></div>-->
-	</p>
-	<p>
-	<br />
-	<h1>Paymethod</h1>
-	</p>
+
+		
 </body>
 </html>
