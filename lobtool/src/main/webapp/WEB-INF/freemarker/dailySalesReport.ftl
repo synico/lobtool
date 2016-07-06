@@ -278,7 +278,7 @@
     	});
 			chart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major" });
 			//chart.addAxis("other x", {leftBottom: false});
-			chart.addAxis("other y", {min: 0, max: 100, fixLower: "minor", fixUpper: "minor", vertical: true, leftBottom: false});
+			chart.addAxis("other y", {min: 0, max: 160, fixLower: "minor", fixUpper: "minor", vertical: true, leftBottom: false});
 
 			// Add the series of data
 			chart.addSeries("MonthlySales",dailySales,{plot: "default",fill:"#AB60F0"});
