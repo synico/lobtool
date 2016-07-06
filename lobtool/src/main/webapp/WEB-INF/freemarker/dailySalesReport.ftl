@@ -208,7 +208,6 @@
 				yLabels[i] = parseFloat(chartColumnsData[i].salesAmount);
 				lyLabels[i] = parseInt(chartColumnsData[i].numOfBill);
 			}
-			console.log(lyLabels);
 			chart.addAxis("x", { labels: xLabels });
 			chart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major", leftBottom: true});
 			chart.addAxis("ly", { vertical: true, leftBottom: false });
@@ -251,10 +250,10 @@
             var preWkNumOfCust = [];
             var preWkBillPerCust = [];
             <#list preWeekDailySalesEntries as entry>
-                preWkDailySales.push();
-                preWkNumOfBill.push();
-                preWkNumOfCust.push();
-                preWkBillPerCust.push();
+                preWkDailySales.push(${entry.numOfBill});
+                preWkNumOfBill.push(${entry.numOfBill});
+                preWkNumOfCust.push(${entry.numOfBill});
+                preWkBillPerCust.push(${entry.numOfBill});
             </#list>
 			
 			// Create the chart within it's "holding" node
@@ -301,15 +300,11 @@
 
 			// x and y coordinates used for easy understanding of where they should display
 			// Data represents website visits over a week period
-			chartData = [
-				{ x: 1, y: 19021, text: "支付宝 16.43%" },
-				{ x: 1, y: 12837, text: "现金 11.09%" },
-				{ x: 1, y: 12378, text: "微信 10.69%" },
-				{ x: 1, y: 21882 },
-				{ x: 1, y: 17654 },
-				{ x: 1, y: 15833 },
-				{ x: 1, y: 16122 }
-			];
+			chartData = [];
+			<#list paymentMethods as entry>
+                 chartData.push({ x: 1, y: ${entry.numOfTrans!'0'}, text: "${entry.payMethodName!'unknow'} ${entry.proportion?string("##.##")}'%'" });
+            </#list>
+			
 
 			require([
 				 // Require the basic 2d chart resource
@@ -324,11 +319,12 @@
 			], function(Chart, theme, PiePlot){
 
 				// Create the chart within it's "holding" node
-				var pieChart = new Chart("paymentMethod", {title: "支付方式",
-      titlePos: "bottom",
-      titleGap: 5,
-      titleFont: "normal normal normal 15pt Microsoft YaHei",
-      titleFontColor: "#014A81"});
+				var pieChart = new Chart("paymentMethod", {
+				                                          title: '<@spring.message "paymentMethodChart.title"/>',
+                                                          titlePos: "bottom",
+                                                          titleGap: 5,
+                                                          titleFont: "normal normal normal 15pt Microsoft YaHei",
+                                                          titleFontColor: "#014A81"});
 				
 				// Set the theme
 				pieChart.setTheme(theme);
@@ -354,11 +350,10 @@
 	<!-- Script 营业额分时段饼图 by Sam -->
 		<script>
 
-			timePeriodData = [
-				{ x: 1, y: 4021, text: "午市 4021 36.1%" },
-				{ x: 1, y: 2037, text: "下午 2037 18.3%" },
-				{ x: 1, y: 5078, text: "晚上 5078 45.6%" }
-			];
+			timePeriodData = [];
+			<#list salesAmount4TimeChart as entry>
+			     timePeriodData.push({ x: 1, y: ${entry.amount?string("##0.#")}, text: '<@spring.messageArgs code="timeChart.noon" args=["${entry.amount}","${entry.proportion?string('##.##')}"]/>' })
+			</#list>
 			require([
 				"dojox/charting/Chart",
 				"dojox/charting/themes/PlotKit/purple",
@@ -367,7 +362,7 @@
 			], function(Chart, theme, PiePlot){
 				// Create the chart within it's "holding" node
 				var pieChart = new Chart("timePeriod", 
-											{title: "营业额 11136￥",
+											{title: '<@spring.messageArgs code="timeChart.title" args=[11136]/>',
       										 titlePos: "bottom",
       										 titleGap: 5,
       										 titleFont: "normal normal normal 15pt Microsoft YaHei",
@@ -397,11 +392,10 @@
 	<!-- Script 用餐人次饼图 by Sam -->
 		<script>
 
-			customerCountData = [
-				{ x: 1, y: 31, text: "午市 31人 31.63%" },
-				{ x: 1, y: 17, text: "下午 17人 17.34%" },
-				{ x: 1, y: 50, text: "晚上 50人 51.02%" }
-			];
+			customerCountData = [];
+			<#list custAmount4TimeChart as entry>
+			     customerCountData.push({ x: 1, y: ${entry.amount?string("##0")}, text: '<@spring.messageArgs code="numOfCustChart.noon" args=["${entry.amount}",'${entry.proportion?string("##.##")}']/>' });
+			</#list>
 			require([
 				"dojox/charting/Chart",
 				"dojox/charting/themes/PlotKit/purple",
@@ -410,7 +404,7 @@
 			], function(Chart, theme, PiePlot){
 				// Create the chart within it's "holding" node
 				var pieChart = new Chart("customerCount", 
-											{title: "用餐人次 98人",
+											{title: '<@spring.messageArgs code="numOfCustChart.title" args=["98"]/>',
       										 titlePos: "bottom",
       										 titleGap: 5,
       										 titleFont: "normal normal normal 15pt Microsoft YaHei",
@@ -441,9 +435,9 @@
 		<script>
 
 			avgPayData = [
-				{ x: 1, y: 81, text: "午市 81￥ 32.79%" },
-				{ x: 1, y: 69, text: "下午 69￥ 27.93%" },
-				{ x: 1, y: 97, text: "晚上 97￥ 39.27%" }
+				{ x: 1, y: 81, text: '<@spring.messageArgs code="billPerCustChart.noon" args=["81","32.79%"]/>' },
+				{ x: 1, y: 69, text: '<@spring.messageArgs code="billPerCustChart.afternoon" args=["69","27.93%"]/>' },
+				{ x: 1, y: 97, text: '<@spring.messageArgs code="billPerCustChart.evening" args=["97","39.27%"]/>' }
 			];
 			require([
 				"dojox/charting/Chart",
@@ -453,7 +447,7 @@
 			], function(Chart, theme, PiePlot){
 				// Create the chart within it's "holding" node
 				var pieChart = new Chart("avgPay", 
-											{title: "人均消费 82.33￥",
+											{title: '<@spring.messageArgs code="billPerCustChart.title" args=["82.33"]/>',
       										 titlePos: "bottom",
       										 titleGap: 5,
       										 titleFont: "normal normal normal 15pt Microsoft YaHei",
@@ -509,7 +503,7 @@
 	<tr bgcolor="#AB60F0"><th>&nbsp;</th><th></th><th></th><th></th><th></th></tr>
 	<!--当月数据汇总-->
 	<tr bgcolor="#eee6f5">
-  		<th><@spring.message "salesAnalysis.monthSummary.present"/></th>
+  		<th><@spring.message "salesAnalysis.monthSummary.current"/></th>
   		<td>${presentMonthSE.totalAmount?string("#0.0#")}</td>
   		<td>${presentMonthSE.numOfBill}</td>
   		<td>${presentMonthSE.numOfCust}</td>
@@ -536,13 +530,14 @@
 	<br />
 
 	<!--View 构建营业额走势图-->
-		<h1>本周营业额走势图</h1>
-		<p id=symbol><img src="../../resources/images/img_currentWeek.jpg"  alt="本周营业额图例" />&nbsp&nbsp本周营业数据&nbsp&nbsp
-					 <img src="../../resources/images/img_lastWeek.jpg" alt="上周营业额图例"/>&nbsp&nbsp上周营业数据&nbsp&nbsp
-					 <img src="../../resources/images/img_blueLine.jpg" alt="客单价"/>&nbsp&nbsp客单价&nbsp&nbsp
-					 <img src="../../resources/images/img_redLine.jpg" alt="来客数"/>&nbsp&nbsp来客数&nbsp&nbsp
+		<h1><@spring.message "salesTrend.title.currentWeek"/></h1>
+		<p id=symbol><img src="../../resources/images/img_currentWeek.jpg"  alt='<@spring.message "salesTrend.legend.currentWeek"/>' />&nbsp&nbsp<@spring.message "salesTrend.salesData.currentWeek"/>&nbsp&nbsp
+					 <img src="../../resources/images/img_lastWeek.jpg" alt='<@spring.message "salesTrend.legend.prevWeek"/>'/>&nbsp&nbsp<@spring.message "salesTrend.salesData.prevWeek"/>&nbsp&nbsp
+					 <img src="../../resources/images/img_blueLine.jpg" alt='<@spring.message "salesTrend.legend.billPerCust"/>'/>&nbsp&nbsp<@spring.message "salesTrend.salesData.billPerCust"/>&nbsp&nbsp
+					 <img src="../../resources/images/img_redLine.jpg" alt='<@spring.message "salesTrend.legend.numOfCust"/>'/>&nbsp&nbsp<@spring.message "salesTrend.salesData.numOfCust"/>&nbsp&nbsp
 		</p>
 		<div id="chartSalesTrend"></div>
+		<div id="chartNode"></div>
 		
 	<!-- View 支付方式饼图 -->
 		<div id="paymentMethod"></div>
@@ -557,7 +552,7 @@
 		<div id="avgPay"></div>
 		
 		
-		<div id=bottomSpaceBlock> <h1>报表已全部加载完成</h1>
+		<div id=bottomSpaceBlock> <h1>Loaded</h1>
 		</div>
 
 

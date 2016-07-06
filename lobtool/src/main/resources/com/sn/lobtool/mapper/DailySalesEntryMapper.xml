@@ -6,16 +6,61 @@
 
   <select id="getDailySalesEntries" resultType="DailySalesEntry">
   	SELECT strftime('%Y-%m-%d',BillTime) as billDate, 
-  			count(*) as numOfBill, 
-  			round(SUM(PaidFee),2) as totalAmount, 
-  			SUM(Persons) as numOfCust, 
-  			round((round(SUM(PaidFee),2)/SUM(Persons)),2) as billPerCust 
+  		   count(*) as numOfBill, 
+  		   round(SUM(PaidFee),2) as totalAmount, 
+  		   SUM(Persons) as numOfCust, 
+  		   round((round(SUM(PaidFee),2)/SUM(Persons)),2) as billPerCust 
   	FROM MhtBill
   	WHERE 1 = 1 and 
   		billDate &lt; date(#{param2}, '+1 day') and 
   		billDate &gt; date(#{param2},'-7 day') 
   	GROUP BY date(BillTime)
   	ORDER BY date(BillTime) ASC
+  </select>
+  
+  <select id="getPaymentMethods4Chart" resultType="PaymentMethods">
+    SELECT bp.PayMethodId as payMethodId,
+           count(*) as numOfTrans,
+           pm.Name as payMethodName
+    FROM MhtBill b
+        left join BillPayDetail bp on b.BillId=bp.BillId 
+        left join PayMethod pm on bp.PayMethodId=pm.PayMethodId 
+    WHERE strftime("%Y-%m-%d",b.BillTime) = #{param1} 
+    GROUP BY bp.PayMethodId
+  </select>
+  
+  <select id="getSalesAmount4TimeChart" resultType="TimeChartEntries">
+    SELECT 1 as seq,
+           round(sum(b.PaidFee),2) as amount
+    FROM MhtBill b 
+    WHERE b.BillTime &lt; datetime('2016-05-14 13:00:00') and 
+          b.BillTime &gt; datetime('2016-05-14 10:00:00')
+    UNION
+    SELECT 2, round(sum(b.PaidFee),2) 
+    FROM MhtBill b 
+    WHERE b.BillTime &lt; datetime('2016-05-14 18:00:00') and 
+          b.BillTime &gt; datetime('2016-05-14 13:00:00')
+    UNION
+    SELECT 3, round(sum(b.PaidFee),2) 
+    FROM MhtBill b 
+    WHERE b.BillTime &lt; datetime('2016-05-14 23:59:59') and 
+          b.BillTime &gt; datetime('2016-05-14 18:00:00')
+  </select>
+  
+  <select id="getCustAmount4TimeChart" resultType="TimeChartEntries">
+    SELECT 1 as seq,
+           sum(b.Persons) as amount
+    FROM MhtBill b 
+    WHERE b.BillTime &lt; datetime('2016-05-14 13:00:00') and 
+          b.BillTime &gt; datetime('2016-05-14 10:00:00')
+    UNION
+    SELECT 2, sum(b.Persons) FROM MhtBill b
+    WHERE b.BillTime &lt; datetime('2016-05-14 18:00:00') and 
+          b.BillTime &gt; datetime('2016-05-14 13:00:00')
+    UNION
+    SELECT 3, sum(b.Persons) FROM MhtBill b
+    WHERE b.BillTime &lt; datetime('2016-05-14 23:59:59') and 
+          b.BillTime &gt; datetime('2016-05-14 18:00:00')
   </select>
 
 </mapper>

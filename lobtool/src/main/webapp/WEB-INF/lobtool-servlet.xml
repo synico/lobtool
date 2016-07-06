@@ -29,7 +29,7 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
      http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd ">
 
-	<context:component-scan base-package="com.sn.lobtool" />
+	<context:component-scan base-package="com.sn.lobtool.controller" />
 	
 	<mvc:annotation-driven />
 	
@@ -44,11 +44,6 @@
     
     <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
     	<property name="templateLoaderPath" value="/WEB-INF/freemarker/"/>
-    </bean>
-    
-    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-    	<property name="prefix" value="/WEB-INF/"></property>
-    	<property name="suffix" value=".jsp"></property>
     </bean>
     
     <!-- i18n -->

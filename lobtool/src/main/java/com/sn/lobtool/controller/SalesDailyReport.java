@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.sn.lobtool.domain.DailySalesEntry;
 import com.sn.lobtool.domain.MonthlySalesEntry;
+import com.sn.lobtool.domain.PaymentMethods;
+import com.sn.lobtool.domain.TimeChartEntries;
 import com.sn.lobtool.service.DailySalesEntryService;
 import com.sn.lobtool.service.MonthlySalesEntryService;
 
@@ -39,6 +41,7 @@ public class SalesDailyReport {
 	    
 	    String formattedPreviousWeekDate = sdfTo.format(searchEndCalendar.getTime());
 	    
+	    //retrive daily sales entries
 		List<DailySalesEntry> dailySalesEntries = dailySalesEntryService.getDailySalesEntries("", formattedSearchEndDate);
 		List<DailySalesEntry> preWeekDailySalesEntries = dailySalesEntryService.getDailySalesEntries("", formattedPreviousWeekDate);
 		
@@ -49,6 +52,11 @@ public class SalesDailyReport {
 		    }
 		}
 		
+		List<PaymentMethods> paymentMethods = dailySalesEntryService.getPaymentMethods4Chart(formattedSearchEndDate);
+		List<TimeChartEntries> salesAmount4TimeChart = dailySalesEntryService.getSalesAmount4TimeChart(formattedSearchEndDate);
+		List<TimeChartEntries> custAmount4TimeChart = dailySalesEntryService.getCustAmount4TimeChart(formattedSearchEndDate);
+		
+		//retrieve monthly sales entries
 		List<MonthlySalesEntry> monthlySalesEntries = monthlySalesEntryService.getMonthlySalesEntries("", formattedSearchEndDate);
 		String presentMonthId = formattedSearchEndDate.substring(0, 7);
 		MonthlySalesEntry presentMonthSE = null;
@@ -66,6 +74,9 @@ public class SalesDailyReport {
 		model.addAttribute("previousMonthSE", previousMonthSE);
 		model.addAttribute("dailySalesEntries", dailySalesEntries);
 		model.addAttribute("preWeekDailySalesEntries", preWeekDailySalesEntries);
+		model.addAttribute("paymentMethods", paymentMethods);
+		model.addAttribute("salesAmount4TimeChart", salesAmount4TimeChart);
+		model.addAttribute("custAmount4TimeChart", custAmount4TimeChart);
 		
 		return "dailySalesReport";
 	}
