@@ -1,6 +1,6 @@
 <#import "spring.ftl" as spring/>
 <html>
-<head>
+<head><!--test-->
 	<link rel="stylesheet" href="../../resources/javascript/dojo/resources/dojo.css" >
 	<link rel="stylesheet" href="../../resources/javascript/dgrid/css/dgrid.css" >
 	<link rel="stylesheet" href="../../resources/javascript/dgrid/css/skins/claro.css" >
