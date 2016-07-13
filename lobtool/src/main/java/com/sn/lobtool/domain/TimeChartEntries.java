@@ -2,18 +2,18 @@ package com.sn.lobtool.domain;
 
 public class TimeChartEntries {
     
-    private Integer seq;
+    private String seqName;
     
     private Double amount;
     
     private Double proportion;
 
-    public Integer getSeq() {
-        return seq;
+    public String getSeqName() {
+        return seqName;
     }
 
-    public void setSeq(Integer seq) {
-        this.seq = seq;
+    public void setSeq(String seqName) {
+        this.seqName = seqName;
     }
 
     public Double getAmount() {

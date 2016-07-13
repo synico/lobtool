@@ -15,5 +15,7 @@ public interface DailySalesEntryMapper {
 	List<TimeChartEntries> getSalesAmount4TimeChart(String searchDate);
 	
 	List<TimeChartEntries> getCustAmount4TimeChart(String searchDate);
+	
+	List<TimeChartEntries> getBillPerCust4TimeChart(String searchDate);
 
 }

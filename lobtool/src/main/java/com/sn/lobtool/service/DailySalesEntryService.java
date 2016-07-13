@@ -32,5 +32,9 @@ public class DailySalesEntryService {
     public List<TimeChartEntries> getCustAmount4TimeChart(String searchDate) {
         return LOBToolUtils.calcProportion4TimeChart(dailySalesEntryMapper.getCustAmount4TimeChart(searchDate));
     }
+    
+    public List<TimeChartEntries> getBillPerCust4TimeChart(String searchDate) {
+        return LOBToolUtils.calcProportion4TimeChart(dailySalesEntryMapper.getBillPerCust4TimeChart(searchDate));
+    }
 
 }
