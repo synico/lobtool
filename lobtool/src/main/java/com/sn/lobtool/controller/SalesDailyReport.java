@@ -43,7 +43,7 @@ public class SalesDailyReport {
         
         DailySalesEntry todaySalesEntry = null;
         for(DailySalesEntry dailySalesEntry : dailySalesEntries) {
-            if(dailySalesEntry.getBillDate().equals(searchEndDate)) {
+            if(dailySalesEntry.getBillDate().equals(formattedSearchDate)) {
                 todaySalesEntry = dailySalesEntry;
             }
         }
