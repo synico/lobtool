@@ -499,10 +499,10 @@
     <!--当日营业数据 table-->
     <tr bgcolor="#eee6f5">
         <th><@spring.message "salesAnalysis.dailySummary"/></th>
-        <td>${todaySE.totalAmount}</td>
+        <td>${todaySE.totalAmount?string("##.##")}</td>
         <td>${todaySE.numOfBill}</td>
         <td>${todaySE.numOfCust}</td>
-        <td>${todaySE.billPerCust}</td>
+        <td>${todaySE.billPerCust?string("##.##")}</td>
     </tr>
     <!--占位行-->
     <tr bgcolor="#AB60F0"><th>&nbsp;</th><th></th><th></th><th></th><th></th></tr>
