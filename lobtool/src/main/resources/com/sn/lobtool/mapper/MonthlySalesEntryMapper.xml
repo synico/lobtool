@@ -13,10 +13,10 @@
 	    FROM MhtBill
 	    WHERE 1 = 1 and 
 	        (BillTime &gt; date(#{param2}, 'start of month') and 
-	         BillTime &lt; date(#{param2}))
+	         BillTime &lt; date(#{param2}, '+1 day'))
 	        or
 	        (BillTime &gt; date(#{param2}, 'start of month', '-1 month') and 
-	         BillTime &lt; date(#{param2}, '-1 month'))
+	         BillTime &lt; date(#{param2}, '-1 month', '+1 day'))
 	    GROUP BY billDate
 	    ORDER BY billDate DESC
     </select>
