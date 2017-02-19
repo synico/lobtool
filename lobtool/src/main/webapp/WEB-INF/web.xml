@@ -4,6 +4,7 @@
 
 <web-app>
   <display-name>LOB tool Web Application</display-name>
+  <description>http://localhost:8080/lobtool/salesReport/daily/20160606</description>
   
   <context-param>
   	<param-name>contextConfigLocation</param-name>
